@@ -1,0 +1,163 @@
+
+  boot_error.log:60:This 
+generated password is for 
+development use only. Your 
+security configuration must 
+be updated before running 
+your application in 
+production.
+  boot_error.log:61:
+> boot_error.log:62:2026-03-0
+3T12:43:36.321+05:30  INFO 
+19324 --- [           main] o
+.s.s.web.DefaultSecurityFilte
+rChain     : Will secure any 
+request with [org.springframe
+work.security.web.session.Dis
+ableEncodeUrlFilter@705dc1a6,
+ org.springframework.security
+.web.context.request.async.We
+bAsyncManagerIntegrationFilte
+r@4a45ff31, org.springframewo
+rk.security.web.context.Secur
+ityContextHolderFilter@2c7607
+e5, org.springframework.secur
+ity.web.header.HeaderWriterFi
+lter@63e40188, org.springfram
+ework.web.filter.CorsFilter@7
+af7c9aa, org.springframework.
+security.web.authentication.l
+ogout.LogoutFilter@49c555c3, 
+com.attendance.system.securit
+y.AuthTokenFilter@5befbac1, o
+rg.springframework.security.w
+eb.savedrequest.RequestCacheA
+wareFilter@7dd847a2, org.spri
+ngframework.security.web.serv
+letapi.SecurityContextHolderA
+wareRequestFilter@75b25ec3, o
+rg.springframework.security.w
+eb.authentication.AnonymousAu
+thenticationFilter@208b8425, 
+org.springframework.security.
+web.session.SessionManagement
+Filter@66c32e15, org.springfr
+amework.security.web.access.E
+xceptionTranslationFilter@5f1
+a3c4, org.springframework.sec
+urity.web.access.intercept.Au
+thorizationFilter@2932721e]
+  boot_error.log:63:2026-03-0
+3T12:43:36.821+05:30  INFO 
+19324 --- [           main] o
+.s.b.w.embedded.tomcat.Tomcat
+WebServer  : Tomcat started 
+on port 8082 (http) with 
+context path ''
+  boot_error.log:64:2026-03-0
+3T12:43:36.833+05:30  INFO 
+19324 --- [           main] c
+.attendance.system.BackendApp
+lication   : Started 
+BackendApplication in 6.127 
+seconds (process running for 
+6.484)
+  boot_error.log:68:2026-03-0
+3T12:44:26.272+05:30  INFO 
+19324 --- [nio-8082-exec-1] o
+.s.web.servlet.DispatcherServ
+let        : Completed 
+initialization in 1 ms
+  
+boot_error.log:69:Hibernate: 
+select s1_0.id,s1_0.class_nam
+e,s1_0.created_at,s1_0.depart
+ment,s1_0.email,s1_0.name,s1_
+0.password,s1_0.student_id 
+from students s1_0 where 
+s1_0.email=?
+> boot_error.log:70:2026-03-0
+3T12:44:26.672+05:30 ERROR 
+19324 --- [nio-8082-exec-2] o
+.a.c.c.C.[.[.[/].[dispatcherS
+ervlet]    : 
+Servlet.service() for 
+servlet [dispatcherServlet] 
+in context with path [] 
+threw exception [Request 
+processing failed: java.lang.
+IllegalArgumentException: 
+Name for argument of type 
+[java.lang.Long] not 
+specified, and parameter 
+name information not 
+available via reflection. 
+Ensure that the compiler 
+uses the '-parameters' 
+flag.] with root cause
+  boot_error.log:71:
+> boot_error.log:72:java.lang
+.IllegalArgumentException: 
+Name for argument of type 
+[java.lang.Long] not 
+specified, and parameter 
+name information not 
+available via reflection. 
+Ensure that the compiler 
+uses the '-parameters' flag.
+  boot_error.log:73:	at org.s
+pringframework.web.method.ann
+otation.AbstractNamedValueMet
+hodArgumentResolver.updateNam
+edValueInfo(AbstractNamedValu
+eMethodArgumentResolver.java:
+185) 
+~[spring-web-6.1.4.jar:6.1.4]
+  boot_error.log:74:	at org.s
+pringframework.web.method.ann
+otation.AbstractNamedValueMet
+hodArgumentResolver.getNamedV
+alueInfo(AbstractNamedValueMe
+thodArgumentResolver.java:160
+) 
+~[spring-web-6.1.4.jar:6.1.4]
+  boot_error.log:101:	at org.
+springframework.security.web.
+access.intercept.Authorizatio
+nFilter.doFilter(Authorizatio
+nFilter.java:100) ~[spring-se
+curity-web-6.2.2.jar:6.2.2]
+  boot_error.log:102:	at org.
+springframework.security.web.
+FilterChainProxy$VirtualFilte
+rChain.doFilter(FilterChainPr
+oxy.java:374) ~[spring-securi
+ty-web-6.2.2.jar:6.2.2]
+> boot_error.log:103:	at org.
+springframework.security.web.
+access.ExceptionTranslationFi
+lter.doFilter(ExceptionTransl
+ationFilter.java:126) ~[sprin
+g-security-web-6.2.2.jar:6.2.
+2]
+> boot_error.log:104:	at org.
+springframework.security.web.
+access.ExceptionTranslationFi
+lter.doFilter(ExceptionTransl
+ationFilter.java:120) ~[sprin
+g-security-web-6.2.2.jar:6.2.
+2]
+  boot_error.log:105:	at org.
+springframework.security.web.
+FilterChainProxy$VirtualFilte
+rChain.doFilter(FilterChainPr
+oxy.java:374) ~[spring-securi
+ty-web-6.2.2.jar:6.2.2]
+  boot_error.log:106:	at org.
+springframework.security.web.
+session.SessionManagementFilt
+er.doFilter(SessionManagement
+Filter.java:131) ~[spring-sec
+urity-web-6.2.2.jar:6.2.2]
+
+

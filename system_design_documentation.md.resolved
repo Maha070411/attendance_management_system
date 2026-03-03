@@ -1,0 +1,205 @@
+﻿System Design: Student Attendance Management System
+
+This document outlines the system architecture, relationships, and sequential flows for the Student Attendance Management System, leveraging a Spring Boot backend and React frontend.
+
+1. Actors
+
+- Student: Users who can log in securely to track their logged hours and navigate through their presence history.
+- Faculty: Authorized personnel possessing privileges to systematically verify and mark students' attendance records.
+
+2. System Features
+
+1. Authentication: Student and Faculty login mechanism using Email and Password, secured with JWT (JSON Web Tokens).
+2. Attendance Marking: Faculty can register attendance specifying the check-in time, check-out time, and the relevant date.
+3. Automated Metrics: System auto-calculates total working hours per entry.
+4. Status Evaluation: Autonomously determines status (`PRESENT`, `LATE`, or `HALF_DAY`) based on parsed working hours.
+5. Validation Controls: Implements logic to prevent duplicate attendance entries for the same student on identical dates.
+6. Data Retrieval: Students have independent tracking capabilities to view their attendance history.
+7. Cardinality: One-to-Many relationship (One `Student` can map to numerous `Attendance` entries across time).
+
+
+3. Use Case Diagram
+
+The sub-system diagram presents interactions between the two primary roles and the core system functionalities.
+
+flowchart LR
+    %% Actors
+    Student((Student))
+    Faculty((Faculty))
+    
+    %% System Boundary
+    subgraph "Attendance Management System"
+        UC1[Login with Email & Password]
+        UC2[View Attendance History]
+        UC3[Mark Student Attendance]
+        UC4[Calculate Total Hours]
+        UC5[Evaluate & Assign Status]
+        UC6[Prevent Duplicate Entries]
+    end
+    
+    %% Interactions
+    Student --> UC1
+    Student --> UC2
+    
+    Faculty --> UC1
+    Faculty --> UC3
+    
+    %% Internal Functional Dependencies
+    UC3 -.->|includes| UC4
+    UC3 -.->|includes| UC5
+    UC3 -.->|includes| UC6
+
+
+
+4. Entity-Relationship (ER) Diagram
+
+A representation of the underlying relational database structure aligning with the required system tables.
+
+erDiagram
+    STUDENTS {
+        int id PK
+        string student_id "UNIQUE"
+        string name
+        string email "UNIQUE"
+        string password
+        string department
+        string class_name
+        datetime created_at
+    }
+
+    FACULTY {
+        int id PK
+        string faculty_id "UNIQUE"
+        string name
+        string email "UNIQUE"
+        string password
+        string department
+        string role
+    }
+
+    ATTENDANCE {
+        int id PK
+        int student_id FK
+        date record_date
+        time check_in_time
+        time check_out_time
+        enum status "PRESENT, LATE, HALF_DAY"
+        float total_hours
+    }
+
+    %% Relationships
+    STUDENTS ||--o{ ATTENDANCE : "has"
+    FACULTY }|--o{ STUDENTS : "manages/tracks"
+
+
+
+5. Class Diagram Structure
+
+This conceptual class mapping represents the programmatic object layer handled by Spring Boot.
+
+classDiagram
+    class User {
+        <<abstract>>
+        -Long id
+        -String name
+        -String email
+        -String password
+        -String department
+        +login() String~JWT~
+    }
+
+    class Student {
+        -String studentId
+        -String className
+        -LocalDateTime createdAt
+        -List~Attendance~ attendanceRecords
+        +viewAttendanceHistory() List~Attendance~
+    }
+
+    class Faculty {
+        -String facultyId
+        -String role
+        +markAttendance(studentId, date, checkIn, checkOut) Attendance
+    }
+
+    class Attendance {
+        -Long id
+        -Student student
+        -LocalDate recordDate
+        -LocalTime checkInTime
+        -LocalTime checkOutTime
+        -AttendanceStatus status
+        -Double totalHours
+        +calculateWorkingHours() Double
+        +determineStatus() AttendanceStatus
+    }
+
+    class AttendanceStatus {
+        <<enumeration>>
+        PRESENT
+        LATE
+        HALF_DAY
+    }
+
+    User <|-- Student
+    User <|-- Faculty
+    Student "1" *-- "0..*" Attendance : holds
+    Attendance o-- AttendanceStatus : status
+
+
+6. Sequence Flow for Marking Attendance
+
+Depicts the standard HTTP transaction and backend service layer handling when a Faculty member submits attendance.
+
+
+sequenceDiagram
+    autonumber
+    actor Faculty
+    participant App as React Frontend
+    participant Security as JWT Filter
+    participant API as AttendanceController
+    participant Logic as AttendanceService
+    participant DBLayer as AttendanceRepository
+    participant RelationalDB as Database
+
+    Faculty->>App: Submits check-in/out form for Student X
+    App->>Security: POST /api/attendance (Bearer Token)
+    Security->>Security: Validate Token & Check Role == FACULTY
+    Security->>API: Route to markAttendance() endpoint
+    
+    API->>Logic: createAttendanceRecord(dto)
+    Logic->>DBLayer: existsByStudentIdAndDate(studentId, date)
+    DBLayer->>RelationalDB: SELECT Count(...) from ATTENDANCE 
+    RelationalDB-->>DBLayer: Returns 0
+    DBLayer-->>Logic: false (No duplicated record)
+    
+    Logic->>Logic: compute totalHours = (checkOut - checkIn)
+    Logic->>Logic: assign status based on schedule constraints
+    
+    Logic->>DBLayer: save(attendanceEntity)
+    DBLayer->>RelationalDB: INSERT INTO ATTENDANCE
+    RelationalDB-->>DBLayer: Returns generated Row
+    DBLayer-->>Logic: Saved entity
+    
+    Logic-->>API: AttendanceResponseDto
+    API-->>App: HTTP 201 Created (Success Payload)
+    App-->>Faculty: Render Success Notification
+
+
+
+7. Non-Functional Requirements (NFRs)
+
+1. Security:
+- Stateless Tokens: API access should be firmly enforced using securely signed JWT tokens restricting endpoints logically using Spring Security.
+- Data Protection: Users' passwords strictly required to be one-way hashed (e.g., using `BCryptPasswordEncoder`) preventing any plaintext footprint in the relational database.
+
+2. Performance & Loading:
+- Implement Database Level constraints alongside Spring's Repository layer, ensuring checks for duplicated attendance perform utilizing optimized `UNIQUE (student_id, record_date)` sequential indexing resulting in $O(1)$ lookups.
+- API endpoints are targeted to process attendance resolutions under a standard 200ms latency parameter.
+
+3. Reliability & Transaction Mapping:
+- Service layers governing attendance creation meticulously wrapped securely in `@Transactional` blocks guaranteeing atomicity—avoiding fragmented system calculation variables inside the DB if an application instance abruptly fails mid-compute.
+
+4. Usability:
+- Rich, highly-responsive frontend React components utilizing seamless time-pickers. Defensive validation in the client blocks anomalous parameters (e.g., preventing check-out time from resolving chronologically before check-in time).
+
